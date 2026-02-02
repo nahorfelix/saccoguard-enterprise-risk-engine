@@ -1,3 +1,4 @@
+![Build Status](https://github.com/nahorfelix/saccoguard-enterprise-risk-engine/actions/workflows/maven-build.yml/badge.svg)
 # SACCOGuard Enterprise 🛡️
 **Real-time Liquidity Intelligence & Risk Mitigation Engine**
 
