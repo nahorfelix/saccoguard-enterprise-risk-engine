@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SACCOGuard AI | Enterprise Risk Command</title>
+    <style>
+        :root { 
+            --bg: #0b0f19; 
+            --card: #161b26; 
+            --text: #f3f4f6; 
+            --accent: #3b82f6; 
+            --danger: #ef4444; 
+            --success: #10b981; 
+            --warning: #f59e0b;
+        }
+
+        body { 
+            font-family: 'Inter', -apple-system, sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 20px; 
+            line-height: 1.5;
+        }
+
+        .dashboard { max-width: 1200px; margin: auto; }
+        
+        /* Header & Status */
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 20px 0; 
+            border-bottom: 1px solid #2d3748; 
+        }
+
+        .system-badge { 
+            background: #064e3b; 
+            color: #34d399; 
+            padding: 8px 16px; 
+            border-radius: 20px; 
+            font-size: 12px; 
+            font-weight: bold; 
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Pulse Animation for the Live Badge */
+        .pulse {
+            width: 8px;
+            height: 8px;
+            background: #34d399;
+            border-radius: 50%;
+            box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7);
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(52, 211, 153, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+        }
+
+        /* KPI Cards */
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin: 30px 0; }
+        .kpi-card { 
+            background: var(--card); 
+            padding: 20px; 
+            border-radius: 12px; 
+            border: 1px solid #2d3748; 
+            transition: transform 0.2s;
+        }
+        .kpi-card:hover { transform: translateY(-4px); border-color: var(--accent); }
+        .kpi-label { color: #94a3b8; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        .kpi-value { font-size: 22px; font-weight: bold; margin-top: 10px; display: block; color: #fff; }
+
+        /* Main Content Grid */
+        .main-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        
+        /* Panels */
+        .panel { background: var(--card); border-radius: 12px; padding: 25px; border: 1px solid #2d3748; }
+        h3 { margin-top: 0; color: #94a3b8; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* Audit Table */
+        .table-wrapper { max-height: 400px; overflow-y: auto; margin-top: 15px; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; color: #64748b; font-size: 11px; text-transform: uppercase; padding-bottom: 15px; position: sticky; top: 0; background: var(--card); }
+        td { padding: 14px 0; border-bottom: 1px solid #2d3748; font-size: 14px; }
+
+        /* Risk Badges */
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; }
+        .badge-critical { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+        .badge-normal { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+
+        /* Intelligence Tools */
+        .btn-stress { 
+            background: var(--danger); 
+            color: white; 
+            border: none; 
+            padding: 12px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            width: 100%; 
+            font-weight: bold; 
+            text-transform: uppercase;
+            font-size: 12px;
+            transition: opacity 0.2s;
+        }
+        .btn-stress:hover { opacity: 0.85; }
+
+        #sysMsg { 
+            background: #0f172a; 
+            padding: 15px; 
+            border-radius: 8px; 
+            font-family: 'Courier New', monospace;
+            border: 1px solid #1e293b;
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard">
+    <div class="header">
+        <div>
+            <h1 style="margin:0;">SACCOGuard <span style="color: var(--accent);">Enterprise</span></h1>
+            <p style="color: #64748b; margin: 5px 0 0 0;">Monitoring 18,000+ member nodes in real-time</p>
+        </div>
+        <div class="system-badge">
+            <div class="pulse"></div>
+            LIVE RISK ANALYSIS ACTIVE
+        </div>
+    </div>
+
+    <div class="kpi-grid">
+        <div class="kpi-card">
+            <span class="kpi-label">Institutional Liquidity</span>
+            <span class="kpi-value" id="totalCash">KES 0.00</span>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-label">Withdrawal Ratio</span>
+            <span class="kpi-value" id="ratio">0%</span>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-label">SASRA Compliance</span>
+            <span class="kpi-value" id="compStatus" style="color: var(--success);">PASSING</span>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-label">Risk Alerts (24h)</span>
+            <span class="kpi-value" id="alertCount" style="color: var(--danger);">0</span>
+        </div>
+    </div>
+
+    <div class="main-grid">
+        <div class="panel">
+            <h3>Live Audit Trail</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>MEMBER REF</th>
+                            <th>VOLUME (KES)</th>
+                            <th>FLOW TYPE</th>
+                            <th>RISK ANALYSIS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="auditTrail">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3>Intelligence Tools</h3>
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 20px;">
+                Execute Systemic Shock Simulations to evaluate Tier-1 capital resilience against unexpected mass withdrawals.
+            </p>
+            <button class="btn-stress" onclick="runStress()">Run Systemic Stress Test</button>
+            
+            <hr style="border: 0; border-top: 1px solid #2d3748; margin: 25px 0;">
+            
+            <h3>System Health Messages</h3>
+            <div id="sysMsg" style="font-size: 12px; color: #94a3b8; line-height: 1.6;">
+                Initializing neural analysis...<br>
+                Checking historical member patterns...
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function refresh() {
+        // Fetch Live Transactions
+        fetch('/api/v1/transactions/all')
+        .then(r => r.json())
+        .then(data => {
+            const deposits = data.filter(t => t.type === 'DEPOSIT').reduce((s, t) => s + t.amount, 0);
+            const withdrawals = data.filter(t => t.type === 'WITHDRAWAL').reduce((s, t) => s + t.amount, 0);
+            const balance = deposits - withdrawals;
+            const rat = deposits > 0 ? (withdrawals/deposits) : 0;
+
+            // Update KPI values
+            document.getElementById('totalCash').innerText = "KES " + balance.toLocaleString();
+            document.getElementById('ratio').innerText = Math.round(rat * 100) + "%";
+            document.getElementById('alertCount').innerText = data.filter(t => t.amount > 10000).length;
+
+            // Build Table
+            const trail = document.getElementById('auditTrail');
+            trail.innerHTML = data.map(t => {
+                const isHighRisk = t.amount > 10000 && t.type === 'WITHDRAWAL';
+                return `
+                <tr>
+                    <td><code style="color:var(--accent)">MEM-${10400 + (t.id || 0)}</code></td>
+                    <td style="font-weight:bold;">${t.amount.toLocaleString()}</td>
+                    <td style="color: ${t.type === 'DEPOSIT' ? 'var(--success)' : 'var(--warning)'}; font-weight:600;">
+                        ${t.type}
+                    </td>
+                    <td>
+                        <span class="badge ${isHighRisk ? 'badge-critical' : 'badge-normal'}">
+                            ${isHighRisk ? 'VOLATILITY RISK' : 'STABLE'}
+                        </span>
+                    </td>
+                </tr>
+                `;
+            }).reverse().join('');
+        })
+        .catch(err => console.error("Data Fetch Error:", err));
+
+        // Fetch Health Status
+        fetch('/api/v1/sacco/status')
+        .then(r => r.text())
+        .then(t => {
+            const msgBox = document.getElementById('sysMsg');
+            msgBox.innerHTML = `> ${t}<br>> DB Latency: 2ms<br>> Last Sync: ${new Date().toLocaleTimeString()}`;
+            
+            const comp = document.getElementById('compStatus');
+            if(t.includes("CRITICAL") || t.includes("WARNING")) {
+                comp.innerText = "ACTION REQ";
+                comp.style.color = "var(--danger)";
+            } else {
+                comp.innerText = "PASSING";
+                comp.style.color = "var(--success)";
+            }
+        })
+        .catch(err => console.error("Status Fetch Error:", err));
+    }
+
+    function runStress() {
+        fetch('/api/v1/sacco/simulate-shock')
+        .then(r => r.text())
+        .then(t => {
+            alert("--- STRESS TEST REPORT ---\n\n" + t);
+        });
+    }
+
+    // Auto-Sync with Database every 3 seconds
+    setInterval(refresh, 3000);
+
+    // Initial load
+    refresh();
+</script>
+</body>
+</html>

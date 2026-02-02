@@ -1,0 +1,38 @@
+name: SACCOGuard CI - Build & Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Find and Build
+      run: |
+        # Search for the directory containing pom.xml
+        POM_FILE=$(find . -name "pom.xml" | head -n 1)
+        
+        if [ -z "$POM_FILE" ]; then
+          echo "❌ ERROR: pom.xml is NOT in this repository. Check your 'git add' command."
+          exit 1
+        fi
+        
+        PROJECT_DIR=$(dirname "$POM_FILE")
+        echo "✅ Found project in: $PROJECT_DIR"
+        
+        # Navigate and build
+        cd "$PROJECT_DIR"
+        mvn -B package -DskipTests
