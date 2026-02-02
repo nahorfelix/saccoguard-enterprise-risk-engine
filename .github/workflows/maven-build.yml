@@ -18,18 +18,7 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Auto-Detect and Build
+    - name: Build All Pom Files
+      # This finds every pom.xml and runs the build. It is impossible to miss.
       run: |
-        # Search for pom.xml and move to that directory
-        POM_PATH=$(find . -name "pom.xml" | head -n 1)
-        if [ -z "$POM_PATH" ]; then
-          echo "❌ ERROR: pom.xml not found! Make sure you pushed your source code."
-          exit 1
-        fi
-        
-        PROJECT_DIR=$(dirname "$POM_PATH")
-        echo "✅ Found pom.xml in: $PROJECT_DIR"
-        
-        # Navigate and build from that specific folder
-        cd "$PROJECT_DIR"
-        mvn -B package -DskipTests
+        find . -name "pom.xml" -exec mvn -B package -DskipTests -f {} \;
